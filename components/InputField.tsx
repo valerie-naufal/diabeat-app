@@ -3,9 +3,13 @@ import { TextInput, StyleSheet } from "react-native";
 export default function InputField({
   placeholder,
   secureTextEntry = false,
+  value,
+  onChangeText,
 }: {
   placeholder: string;
   secureTextEntry?: boolean;
+  value: string;
+  onChangeText: (text: string) => void;
 }) {
   return (
     <TextInput
@@ -13,6 +17,9 @@ export default function InputField({
       placeholder={placeholder}
       placeholderTextColor="#888"
       secureTextEntry={secureTextEntry}
+      autoCapitalize="none"
+      value={value}
+      onChangeText={onChangeText}
     />
   );
 }

@@ -7,6 +7,7 @@ import { auth } from "../../firebase/config";
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const user = auth.currentUser;
 
   const handleLogout = async () => {
     try {
@@ -30,24 +31,32 @@ export default function ProfileScreen() {
 
       {/* Avatar */}
       <Image
-        source={require("../../assets/icons/profile.svg")} // replace with your profile placeholder
+        source={require("../../assets/icons/profile.svg")}
         style={styles.avatar}
       />
       <View style={styles.nameRow}>
-        <Text style={styles.name}>John Doe</Text>
+        <Text style={styles.name}>
+          {user?.displayName}
+        </Text>
         <Ionicons name="pencil-outline" size={20} color={Colors.primary} />
       </View>
 
       {/* Details */}
-      <View style={styles.info}>
-        <Text>
-          <Text style={styles.bold}>Email:</Text> John.doe@gmail.com
+      <View style={styles.infoBox}>
+        <Text style={styles.infoText}>
+          <Text style={styles.label}>UID: </Text>
+          {user?.uid}
         </Text>
-        <Text>
-          <Text style={styles.bold}>Phone Number:</Text> +1 234 567 89
+        <Text style={styles.infoText}>
+          <Text style={styles.label}>Email:</Text>
+          {user?.email || "Not available"}
         </Text>
-        <Text>
-          <Text style={styles.bold}>Language:</Text> English
+        <Text style={styles.infoText}>
+          <Text style={styles.label}>Phone Number:</Text>{" "}
+          {user?.phoneNumber || "Not available"}
+        </Text>
+        <Text style={styles.infoText}>
+          <Text style={styles.label}>Language:</Text> English
         </Text>
       </View>
 
@@ -97,7 +106,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   name: { fontSize: 20, fontWeight: "600", color: Colors.primary },
-  info: { gap: 8, marginBottom: 24 },
+  infoBox: {
+    marginTop: 20,
+    padding: 16,
+    borderRadius: 10,
+    backgroundColor: "#f5f5f5",
+  },
+  label: {
+    fontWeight: "600",
+    color: Colors.primary,
+  },
+  infoText: {
+    fontSize: 16,
+    marginBottom: 8,
+    color: "#333",
+  },
   bold: { fontWeight: "bold", color: Colors.primary },
   button: {
     backgroundColor: Colors.primary,

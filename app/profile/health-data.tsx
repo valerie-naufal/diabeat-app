@@ -9,18 +9,34 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
+import { auth } from "../../firebase/config";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { useEffect, useState } from "react";
 
-const data = {
-  type: "1",
-  bloodType: "A+",
-  height: "180 cm",
-  weight: "100 Kg",
-  emergency1: "",
-  emergency2: "",
-};
 
 export default function HealthDataScreen() {
   const router = useRouter();
+  const user = auth.currentUser;
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setProfile(docSnap.data());
+      } else {
+        console.log("No profile found.");
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -42,24 +58,24 @@ export default function HealthDataScreen() {
       {/* Data */}
       <View style={styles.info}>
         <Text>
-          <Text style={styles.bold}>Type:</Text> {data.type}
+          <Text style={styles.bold}>Type:</Text>{" "}
+          {profile?.diabetesType || "Not available"}
         </Text>
         <Text>
-          <Text style={styles.bold}>Blood Type:</Text> {data.bloodType}
+          <Text style={styles.bold}>Blood Type:</Text>{" "}
+          {profile?.bloodType || "Not available"}
         </Text>
         <Text>
-          <Text style={styles.bold}>Height:</Text> {data.height}
+          <Text style={styles.bold}>Height:</Text>{" "}
+          {profile?.height || "Not available"}
         </Text>
         <Text>
-          <Text style={styles.bold}>Weight:</Text> {data.weight}
+          <Text style={styles.bold}>Weight:</Text>{" "}
+          {profile?.weight || "Not available"}
         </Text>
         <Text>
           <Text style={styles.bold}>Emergency Contact #1:</Text>{" "}
-          {data.emergency1}
-        </Text>
-        <Text>
-          <Text style={styles.bold}>Emergency Contact #2:</Text>{" "}
-          {data.emergency2}
+          {profile?.emergency || "Not available"}
         </Text>
       </View>
 

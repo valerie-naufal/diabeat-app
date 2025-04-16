@@ -9,12 +9,20 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../firebase/config";
+import { db } from "../firebase/config";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function RegisterScreen() {
   const [fullName, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [phone, setPhone] = useState("");
+  const [emergency, setEmergency] = useState("");
+  const [diabetesType, setDiabetesType] = useState("");
+  const [bloodType, setBloodType] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
   const router = useRouter();
 
   const handleRegister = async () => {
@@ -28,17 +36,30 @@ export default function RegisterScreen() {
       return;
     }
 
-    console.log("EMAIL:", email);
-    console.log("PASSWORD:", password);
-
     try {
-      await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
+      const user = userCredential.user;
+
+      // Save extra info to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        phone,
+        emergency,
+        diabetesType,
+        bloodType,
+        height,
+        weight,
+      });
+
       router.replace("/dashboard");
     } catch (err: any) {
       alert("Registration failed: " + err.message);
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -48,6 +69,36 @@ export default function RegisterScreen() {
         placeholder="Full Name"
         value={fullName}
         onChangeText={setName}
+      />
+      <InputField
+        placeholder="Phone Number"
+        value={phone}
+        onChangeText={setPhone}
+      />
+      <InputField
+        placeholder="Emergency Contact"
+        value={emergency}
+        onChangeText={setEmergency}
+      />
+      <InputField
+        placeholder="Diabetes Type (1 or 2)"
+        value={diabetesType}
+        onChangeText={setDiabetesType}
+      />
+      <InputField
+        placeholder="Blood Type"
+        value={bloodType}
+        onChangeText={setBloodType}
+      />
+      <InputField
+        placeholder="Height (cm)"
+        value={height}
+        onChangeText={setHeight}
+      />
+      <InputField
+        placeholder="Weight (kg)"
+        value={weight}
+        onChangeText={setWeight}
       />
       <InputField placeholder="Email" value={email} onChangeText={setEmail} />
       <InputField

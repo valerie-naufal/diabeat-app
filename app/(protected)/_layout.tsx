@@ -1,10 +1,28 @@
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { TouchableOpacity } from "react-native";
+import { useEffect } from "react";
+import { useAuth } from "../../hooks/useAuth";
+import { ActivityIndicator, View } from "react-native";
+import {Colors} from "../../constants/Colors";
 
-export default function TabLayout() {
+
+export default function ProtectedLayout() {
   const router = useRouter();
+  const { isLoggedIn, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      router.replace("/login");
+    }
+  }, [loading, isLoggedIn]);
+
+  if (loading || !isLoggedIn) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <Tabs
@@ -14,7 +32,7 @@ export default function TabLayout() {
           paddingBottom: 10,
           paddingTop: 10,
         },
-        tabBarActiveTintColor: "#1C79E9",
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: "#999",
         headerShown: false,
       }}

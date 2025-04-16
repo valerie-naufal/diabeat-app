@@ -4,10 +4,32 @@ import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/config";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { useEffect, useState } from "react";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const user = auth.currentUser;
+    const [profile, setProfile] = useState<any>(null);
+  
+    useEffect(() => {
+      const fetchProfile = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+  
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          setProfile(docSnap.data());
+        } else {
+          console.log("No profile found.");
+        }
+      };
+  
+      fetchProfile();
+    }, []);
 
   const handleLogout = async () => {
     try {
@@ -53,7 +75,7 @@ export default function ProfileScreen() {
         </Text>
         <Text style={styles.infoText}>
           <Text style={styles.label}>Phone Number:</Text>{" "}
-          {user?.phoneNumber || "Not available"}
+          {profile?.phone || "Not available"}
         </Text>
         <Text style={styles.infoText}>
           <Text style={styles.label}>Language:</Text> English

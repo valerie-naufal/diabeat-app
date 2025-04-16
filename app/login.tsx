@@ -1,23 +1,42 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useState } from "react";
 import InputField from "../components/InputField";
 import ActionButton from "../components/ActionButton";
 import { Colors } from "../constants/Colors";
 import { useRouter } from "expo-router";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../firebase/config";
 
 export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      router.replace("/dashboard");
+    } catch (err: any) {
+      alert("Login failed: " + err.message);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
 
-      <InputField placeholder="Email" />
-      <InputField placeholder="Password" secureTextEntry />
-
-      <ActionButton
-        title="Login"
-        onPress={() => console.log("Logging in...")}
+      <InputField placeholder="Email" value={email} onChangeText={setEmail} />
+      <InputField
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
+
+      <ActionButton title="Login" onPress={handleLogin} />
 
       <TouchableOpacity onPress={() => router.push("/register")}>
         <Text style={styles.signupText}>
@@ -33,7 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 24,
-    backgroundColor: Colors.primary,
+    backgroundColor: "fff",
   },
   title: {
     fontSize: 28,

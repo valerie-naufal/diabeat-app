@@ -2,9 +2,20 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase/config";
 
 export default function ProfileScreen() {
   const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.replace("/login");
+    } catch (err: any) {
+      alert("Logout failed: " + err.message);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -54,6 +65,10 @@ export default function ProfileScreen() {
       >
         <Text style={styles.buttonText}>My Device</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -92,4 +107,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  logoutButton: {
+    backgroundColor: "#f44336",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  logoutText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });

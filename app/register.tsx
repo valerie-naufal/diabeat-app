@@ -46,6 +46,7 @@ export default function RegisterScreen() {
 
       // Save extra info to Firestore
       await setDoc(doc(db, "users", user.uid), {
+        fullName,
         email: user.email,
         phone,
         emergency,

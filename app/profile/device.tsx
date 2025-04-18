@@ -9,6 +9,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
+import Header from "@/components/Header";
+import { useEffect, useState } from "react";
+import { auth } from "../../firebase/config";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 const device = {
   number: "HSUW34WHW",
@@ -17,19 +22,35 @@ const device = {
 
 export default function DeviceScreen() {
   const router = useRouter();
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setProfile(docSnap.data());
+      } else {
+        console.log("No profile found.");
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../../assets/icons/logo.png")}
-        style={styles.icon}
-      />
+      <Header></Header>
 
       <Image
         source={require("../../assets/icons/profile.svg")}
         style={styles.avatar}
       />
-      <Text style={styles.name}>John Doe</Text>
+      <Text style={styles.name}>{profile?.fullName}</Text>
 
       <Text style={styles.label}>
         <Text style={styles.bold}>Device Number:</Text> {device.number}

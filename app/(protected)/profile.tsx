@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
+import Header from "../../components/Header";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
@@ -11,7 +12,7 @@ import { useEffect, useState } from "react";
 export default function ProfileScreen() {
   const router = useRouter();
   const user = auth.currentUser;
-    const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   
     useEffect(() => {
       const fetchProfile = async () => {
@@ -43,13 +44,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Image
-          source={require("../../assets/icons/logo.png")}
-          style={styles.icon}
-        />
-        <Text style={styles.greeting}>Hi, John!</Text>
-      </View>
+      <Header></Header>
 
       {/* Avatar */}
       <Image
@@ -58,7 +53,7 @@ export default function ProfileScreen() {
       />
       <View style={styles.nameRow}>
         <Text style={styles.name}>
-          {user?.displayName}
+          {profile?.fullName}
         </Text>
         <Ionicons name="pencil-outline" size={20} color={Colors.primary} />
       </View>

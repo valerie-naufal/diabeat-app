@@ -13,6 +13,7 @@ import { auth } from "../../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useEffect, useState } from "react";
+import Header from "@/components/Header";
 
 
 export default function HealthDataScreen() {
@@ -41,19 +42,14 @@ export default function HealthDataScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Image
-          source={require("../../assets/icons/logo.png")}
-          style={styles.icon}
-        />
-      </View>
+      <Header></Header>
 
       {/* Avatar */}
       <Image
         source={require("../../assets/icons/profile.svg")}
         style={styles.avatar}
       />
-      <Text style={styles.name}>John Doe</Text>
+      <Text style={styles.name}>{profile?.fullName}</Text>
 
       {/* Data */}
       <View style={styles.info}>

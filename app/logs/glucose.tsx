@@ -9,6 +9,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
+import HeaderBlue from "@/components/HeaderBlue";
 
 const glucoseLogs = [
   { id: "1", value: 100, status: "normal" },
@@ -39,13 +40,7 @@ export default function GlucoseLogsScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.banner}>
-        <View style={styles.bannerTop}>
-          <Image
-            source={require("../../assets/icons/logo.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.greeting}>Hi, John!</Text>
-        </View>
+        <HeaderBlue></HeaderBlue>
         <View style={styles.bannerBottom}>
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="#fff" />

@@ -5,29 +5,28 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useEffect, useState } from "react";
 
+export default function HeaderBlue() {
+  const user = auth.currentUser;
+  const [profile, setProfile] = useState<any>(null);
 
-export default function Header() {
-    const user = auth.currentUser;
-    const [profile, setProfile] = useState<any>(null);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
 
-    useEffect(() => {
-      const fetchProfile = async () => {
-        const user = auth.currentUser;
-        if (!user) return;
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
 
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setProfile(docSnap.data());
+      } else {
+        console.log("No profile found.");
+      }
+    };
 
-        if (docSnap.exists()) {
-          setProfile(docSnap.data());
-        } else {
-          console.log("No profile found.");
-        }
-      };
+    fetchProfile();
+  }, []);
 
-      fetchProfile();
-    }, []);
-  
   return (
     <View style={styles.header}>
       <Image source={require("../assets/icons/logo.png")} style={styles.icon} />
@@ -43,7 +42,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 16,
+    backgroundColor: Colors.primary,
+    alignItems:"center"
   },
-  icon: { width: 50, height: 50, resizeMode: "contain" },
-  greeting: { color: Colors.primary, fontWeight: "600",fontSize:18 },
+  icon: { width: 50, height: 50, resizeMode: "contain",borderRadius:10 },
+  greeting: { color: "white", fontWeight: "600", fontSize: 18 },
 });

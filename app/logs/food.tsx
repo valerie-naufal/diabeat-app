@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import { Logo } from "../../constants/Logo";
+import HeaderBlue from "../../components/HeaderBlue";
 
 const foodItems = [
   { id: "1", label: "Breakfast", item: "Cereal", calories: 200 },
@@ -28,13 +29,7 @@ export default function FoodLogsScreen() {
     <View style={styles.container}>
       {/* Top Banner */}
       <View style={styles.banner}>
-        <View style={styles.bannerHeader}>
-          <Image
-            source={require("../../assets/icons/logo.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.greeting}>Hi, John!</Text>
-        </View>
+        <HeaderBlue></HeaderBlue>
         <View style={styles.bannerFooter}>
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="#fff" />

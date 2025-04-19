@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import { Logo } from "../../constants/Logo";
+import Header from "@/components/Header";
 
 export default function LogsScreen() {
   const router = useRouter();
@@ -9,13 +10,7 @@ export default function LogsScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Image
-          source={require("../../assets/icons/logo.png")}
-          style={styles.icon}
-        />
-        <Text style={styles.greeting}>Hi, John!</Text>
-      </View>
+      <Header></Header>
 
       {/* Bubbles */}
       <View style={styles.bubbleContainer}>

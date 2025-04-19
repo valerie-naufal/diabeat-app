@@ -1,18 +1,13 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Colors } from "../../constants/Colors";
+import Header from "@/components/Header";
 
 export default function ConsumptionScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Image
-          source={require("../../assets/icons/logo.png")}
-          style={styles.icon}
-        />
-        <Text style={styles.greeting}>Hi, John!</Text>
-      </View>
-
+      <Header></Header>
+      
       {/* Insulin Bar */}
       <View style={styles.insulinSection}>
         <Image

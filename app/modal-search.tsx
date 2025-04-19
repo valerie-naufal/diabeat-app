@@ -9,9 +9,33 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors } from "../constants/Colors";
+import { auth } from "../firebase/config";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/config";
+import { useEffect, useState } from "react";
 
 export default function ModalSearchScreen() {
   const router = useRouter();
+  const user = auth.currentUser;
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setProfile(docSnap.data());
+      } else {
+        console.log("No profile found.");
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -21,13 +45,17 @@ export default function ModalSearchScreen() {
           source={require("../assets/icons/logo.png")}
           style={styles.icon}
         />
-        <Text style={styles.greeting}>Hi, John!</Text>
-        <Ionicons
-          name="close"
-          size={24}
-          color={Colors.primary}
-          onPress={() => router.back()}
-        />
+        <View style={styles.headerRight}>
+          <Text style={styles.greeting}>
+            Hi, <Text>{profile?.fullName || "Not available"}</Text>
+          </Text>
+          <Ionicons
+            name="close"
+            size={24}
+            color={Colors.primary}
+            onPress={() => router.back()}
+          />
+        </View>
       </View>
 
       {/* Search */}
@@ -43,11 +71,11 @@ export default function ModalSearchScreen() {
       {/* Shortcuts */}
       <View style={styles.actions}>
         <View style={styles.action}>
-          <Ionicons name="time-outline" size={24} color={Colors.primary} />
+          <Ionicons name="time-outline" size={30} color={Colors.primary} />
           <Text style={styles.actionLabel}>Recents</Text>
         </View>
         <View style={styles.action}>
-          <Ionicons name="barcode-outline" size={24} color={Colors.primary} />
+          <Ionicons name="barcode-outline" size={30} color={Colors.primary} />
           <Text style={styles.actionLabel}>Scan</Text>
         </View>
       </View>
@@ -63,8 +91,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  icon: { width: 28, height: 28, resizeMode: "contain" },
-  greeting: { color: Colors.primary, fontWeight: "600", fontSize: 16 },
+  headerRight: { flexDirection: "row", justifyContent: "space-between", width: "10%"},
+  icon: { width: 50, height: 50, resizeMode: "contain" },
+  greeting: { color: Colors.primary, fontWeight: "600", fontSize: 18 },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",

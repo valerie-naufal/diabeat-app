@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
@@ -8,29 +15,60 @@ import { auth } from "../../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useEffect, useState } from "react";
+import { updateDoc } from "firebase/firestore";
+import ActionButton from "@/components/ActionButton";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const user = auth.currentUser;
   const [profile, setProfile] = useState<any>(null);
-  
-    useEffect(() => {
-      const fetchProfile = async () => {
-        const user = auth.currentUser;
-        if (!user) return;
-  
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-  
-        if (docSnap.exists()) {
-          setProfile(docSnap.data());
-        } else {
-          console.log("No profile found.");
-        }
-      };
-  
-      fetchProfile();
-    }, []);
+  const [editMode, setEditMode] = useState(false);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const handleSave = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const docRef = doc(db, "users", user.uid);
+
+    try {
+      await updateDoc(docRef, {
+        email,
+        phone,
+      });
+
+      setEditMode(false);
+      alert("Profile updated!");
+    } catch (err: any) {
+      alert("Failed to update: " + err.message);
+    }
+  };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setProfile(docSnap.data());
+      } else {
+        console.log("No profile found.");
+      }
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setProfile(data);
+        setEmail(data.email || "");
+        setPhone(data.phone || "");
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -52,10 +90,7 @@ export default function ProfileScreen() {
         style={styles.avatar}
       />
       <View style={styles.nameRow}>
-        <Text style={styles.name}>
-          {profile?.fullName}
-        </Text>
-        <Ionicons name="pencil-outline" size={20} color={Colors.primary} />
+        <Text style={styles.name}>{profile?.fullName}</Text>
       </View>
 
       {/* Details */}
@@ -64,43 +99,68 @@ export default function ProfileScreen() {
           <Text style={styles.label}>UID: </Text>
           {user?.uid}
         </Text>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Email:</Text>
-          {user?.email || "Not available"}
-        </Text>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Phone Number:</Text>{" "}
-          {profile?.phone || "Not available"}
-        </Text>
+        <Text style={styles.label}>Email:</Text>
+        {editMode ? (
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+        ) : (
+          <Text style={styles.value}>{user?.email || "Not available"}</Text>
+        )}
+
+        <Text style={styles.label}>Phone Number:</Text>
+        {editMode ? (
+          <TextInput
+            value={phone}
+            onChangeText={setPhone}
+            style={styles.input}
+          />
+        ) : (
+          <Text style={styles.value}>{profile?.phone || "Not available"}</Text>
+        )}
+
         <Text style={styles.infoText}>
           <Text style={styles.label}>Language:</Text> English
         </Text>
       </View>
+      <View style={styles.buttonSection}>
+        <ActionButton
+          title="Health Info"
+          onPress={() => router.push("/profile/health-data")}
+        ></ActionButton>
 
-      {/* Navigation buttons */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.push("/profile/health-data")}
-      >
-        <Text style={styles.buttonText}>Health Data</Text>
-      </TouchableOpacity>
+        <ActionButton
+          title="My Device"
+          onPress={() => router.push("/profile/device")}
+        ></ActionButton>
+        
+        <TouchableOpacity
+          onPress={() => (editMode ? handleSave() : setEditMode(true))}
+          style={styles.editButton}
+        >
+          <Text style={styles.editText}>{editMode ? "Save" : "Edit"}</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.push("/profile/device")}
-      >
-        <Text style={styles.buttonText}>My Device</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
+      <View style={styles.logoutSection}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 24, paddingTop: 40 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 24,
+    paddingTop: 40,
+    overflowY: "scroll",
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -132,6 +192,7 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: "600",
     color: Colors.primary,
+    fontSize: 16,
   },
   infoText: {
     fontSize: 16,
@@ -139,24 +200,46 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   bold: { fontWeight: "bold", color: Colors.primary },
-  button: {
-    backgroundColor: Colors.primary,
-    padding: 14,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  logoutSection: { alignItems: "center" },
   logoutButton: {
     backgroundColor: "#f44336",
     padding: 14,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 20,
+    width: "15%",
   },
   logoutText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  input: {
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 12,
+  },
+  value: { fontSize: 16 },
+  editButton: {
+    backgroundColor: "#5286ff",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 6,
+    width: "10%",
+  },
+  editText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buttonSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: 20,
   },
 });

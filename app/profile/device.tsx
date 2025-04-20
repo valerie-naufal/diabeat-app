@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { auth } from "../../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import ActionButton from "@/components/ActionButton";
 
 const device = {
   number: "HSUW34WHW",
@@ -45,6 +46,9 @@ export default function DeviceScreen() {
   return (
     <View style={styles.container}>
       <Header></Header>
+      <TouchableOpacity onPress={() => router.back()} style={styles.back}>
+        <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+      </TouchableOpacity>
 
       <Image
         source={require("../../assets/icons/profile.svg")}
@@ -60,13 +64,11 @@ export default function DeviceScreen() {
         <Text style={{ color: "green" }}>{device.status}</Text>
       </Text>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Connect Device</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-        <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-      </TouchableOpacity>
+      <ActionButton
+        title="Connect Device"
+        onPress={() => router.push("/profile")}
+      ></ActionButton>
+      
     </View>
   );
 }

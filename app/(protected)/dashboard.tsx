@@ -3,19 +3,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { Logo } from "../../constants/Logo";
 import { useRouter } from "expo-router";
+import Header from "@/components/Header";
 
 export default function DashboardScreen() {
   const router = useRouter();
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Image
-          source={require("../../assets/icons/logo.png")}
-          style={styles.icon}
-        />
-        <Text style={styles.greeting}>Hi, John!</Text>
-      </View>
+      <Header></Header>
 
       {/* Blood Glucose Reading */}
       <View style={styles.glucoseContainer}>

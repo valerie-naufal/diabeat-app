@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
+import Header from "@/components/Header";
 
 const options = [
   { label: "Breakfast", icon: require("../../assets/icons/breakfast.svg") },
@@ -17,13 +17,7 @@ export default function AddScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          source={require("../../assets/icons/logo.png")}
-          style={styles.icon}
-        />
-        <Text style={styles.greeting}>Hi, John!</Text>
-      </View>
+      <Header></Header>
 
       <View style={styles.grid}>
         {options.map((item) => (

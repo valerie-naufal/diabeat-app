@@ -34,6 +34,7 @@ export default function LogsScreen() {
   return (
     <View style={styles.container}>
       <Header></Header>
+
       {cards.map((card) => (
         <TouchableOpacity
           key={card.label}
@@ -70,11 +71,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     gap: 16,
   },
+  cardContainer: {
+    width: "100%",
+    flexDirection: "column",
+    alignItems: "center",
+  },
   cardWrapper: {
     height: 140,
     borderRadius: 16,
     overflow: "hidden",
-    width: "30%",
   },
   cardImage: {
     flex: 1,

@@ -1,74 +1,96 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
-import { Colors } from "../../constants/Colors";
-import { Logo } from "../../constants/Logo";
+import { LinearGradient } from "expo-linear-gradient";
 import Header from "@/components/Header";
+import { Colors } from "@/constants/Colors";
 
 export default function LogsScreen() {
   const router = useRouter();
 
+  const cards = [
+    {
+      label: "Food",
+      route: "/logs/food",
+      image: require("../../assets/images/food-bg.jpg"),
+    },
+    {
+      label: "Glucose",
+      route: "/logs/glucose",
+      image: require("../../assets/images/glucose-bg.jpg"),
+    },
+    {
+      label: "Insulin",
+      route: "/logs/insulin",
+      image: require("../../assets/images/insulin-bg.jpg"),
+    },
+  ] as const;
+
   return (
     <View style={styles.container}>
-      {/* Header */}
       <Header></Header>
-
-      {/* Bubbles */}
-      <View style={styles.bubbleContainer}>
+      {cards.map((card) => (
         <TouchableOpacity
-          style={styles.bubble}
-          onPress={() => router.push("/logs/food")}
+          key={card.label}
+          onPress={() => router.push(card.route)}
+          style={styles.cardWrapper}
         >
-          <Text style={styles.bubbleText}>Food</Text>
+          <ImageBackground
+            source={card.image}
+            style={styles.cardImage}
+            imageStyle={{ borderRadius: 16, resizeMode: "cover" }}
+          >
+            <LinearGradient
+              colors={[
+                "transparent",
+                "rgba(180, 210, 255, 0.4)",
+                "rgba(180, 210, 255, 0.8)",
+              ]}
+              style={styles.overlay}
+            >
+              <Text style={styles.label}>{card.label}</Text>
+            </LinearGradient>
+          </ImageBackground>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.bubble}
-          onPress={() => router.push("/logs/glucose")}
-        >
-          <Text style={styles.bubbleText}>Glucose</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.bubble}
-          onPress={() => router.push("/logs/insulin")}
-        >
-          <Text style={styles.bubbleText}>Insulin</Text>
-        </TouchableOpacity>
-      </View>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, backgroundColor: "#fff" },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 40,
+  container: {
+    flex: 1,
+    padding: 24,
+    paddingTop: 40,
+    backgroundColor: "#fff",
+    gap: 16,
   },
-  icon: {
-    width: Logo.width,
-    height: Logo.height,
-    resizeMode: "contain",
+  cardWrapper: {
+    height: 140,
+    borderRadius: 16,
+    overflow: "hidden",
+    width: "30%",
   },
-  greeting: {
+  cardImage: {
+    flex: 1,
+    justifyContent: "flex-end",
+    width: "100%",
+    height: "100%",
+  },
+  overlay: {
+    height: "100%",
+    justifyContent: "flex-end",
+    padding: 16,
+    borderRadius: 16,
+  },
+  label: {
     color: Colors.primary,
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  bubbleContainer: {
-    alignItems: "center",
-    gap: 20,
-  },
-  bubble: {
-    backgroundColor: Colors.primary,
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bubbleText: {
-    color: "#fff",
+    fontSize: 20,
     fontWeight: "bold",
-    fontSize: 16,
   },
 });

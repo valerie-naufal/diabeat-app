@@ -64,7 +64,7 @@ export default function FoodLogsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#fff", overflowY: "scroll" },
   banner: {
     backgroundColor: Colors.primary,
     padding: 16,

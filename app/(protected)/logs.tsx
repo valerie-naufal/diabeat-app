@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     backgroundColor: "#fff",
     gap: 16,
+    overflowY: "scroll",
   },
   cardContainer: {
     width: "100%",

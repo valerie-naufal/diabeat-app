@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 24,
     paddingTop: 40,
+    overflowY: "scroll",
   },
   header: {
     flexDirection: "row",

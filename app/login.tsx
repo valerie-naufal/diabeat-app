@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 24,
     backgroundColor: "fff",
+    overflowY: "scroll"
   },
   title: {
     fontSize: 28,

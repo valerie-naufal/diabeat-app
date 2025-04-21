@@ -84,14 +84,24 @@ export default function ModalSearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 24, paddingTop: 60 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 24,
+    paddingTop: 60,
+    overflowY: "scroll",
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
   },
-  headerRight: { flexDirection: "row", justifyContent: "space-between", width: "10%"},
+  headerRight: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "10%",
+  },
   icon: { width: 50, height: 50, resizeMode: "contain" },
   greeting: { color: Colors.primary, fontWeight: "600", fontSize: 18 },
   searchContainer: {

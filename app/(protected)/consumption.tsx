@@ -1,51 +1,54 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Colors } from "../../constants/Colors";
 import Header from "@/components/Header";
+import ScreenWrapper from "@/components/ScreenWrapper";
 
 export default function ConsumptionScreen() {
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <Header></Header>
-      
-      {/* Insulin Bar */}
-      <View style={styles.insulinSection}>
-        <Image
-          source={require("../../assets/icons/vial.png")} // Replace with your own insulin icon
-          style={styles.vialImage}
-        />
-        <View>
-          <Text style={styles.percentage}>65%</Text>
-          <Text style={styles.amount}>3.7ml</Text>
-          <Text style={styles.label}>Insulin</Text>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        {/* Header */}
+        <Header></Header>
+
+        {/* Insulin Bar */}
+        <View style={styles.insulinSection}>
+          <Image
+            source={require("../../assets/icons/vial.png")}
+            style={styles.vialImage}
+          />
+          <View>
+            <Text style={styles.percentage}>65%</Text>
+            <Text style={styles.amount}>3.7ml</Text>
+            <Text style={styles.label}>Insulin</Text>
+          </View>
+        </View>
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Bracelet Battery */}
+        <View style={styles.deviceRow}>
+          <Text style={styles.deviceLabel}>Bracelet</Text>
+          <Image
+            source={require("../../assets/icons/green-battery.png")}
+            style={styles.batteryIcon}
+          />
+          <Text style={[styles.batteryText, { color: "green" }]}>75%</Text>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Belt Battery */}
+        <View style={styles.deviceRow}>
+          <Text style={styles.deviceLabel}>Belt</Text>
+          <Image
+            source={require("../../assets/icons/red-battery.png")}
+            style={styles.batteryIcon}
+          />
+          <Text style={[styles.batteryText, { color: "red" }]}>18%</Text>
         </View>
       </View>
-
-      {/* Divider */}
-      <View style={styles.divider} />
-
-      {/* Bracelet Battery */}
-      <View style={styles.deviceRow}>
-        <Text style={styles.deviceLabel}>Bracelet</Text>
-        <Image
-          source={require("../../assets/icons/green-battery.png")} // Replace with your battery icon
-          style={styles.batteryIcon}
-        />
-        <Text style={[styles.batteryText, { color: "green" }]}>75%</Text>
-      </View>
-
-      <View style={styles.divider} />
-
-      {/* Belt Battery */}
-      <View style={styles.deviceRow}>
-        <Text style={styles.deviceLabel}>Belt</Text>
-        <Image
-          source={require("../../assets/icons/red-battery.png")} // Replace with your battery icon
-          style={styles.batteryIcon}
-        />
-        <Text style={[styles.batteryText, { color: "red" }]}>18%</Text>
-      </View>
-    </View>
+    </ScreenWrapper>
   );
 }
 

@@ -2,7 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Image,
   TextInput,
@@ -16,10 +15,10 @@ import { db } from "../../firebase/config";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { updateDoc } from "firebase/firestore";
+import FormWrapper from "@/components/FormWrapper";
 
 export default function HealthDataScreen() {
   const router = useRouter();
-  const user = auth.currentUser;
   const [profile, setProfile] = useState<any>(null);
   const [editMode, setEditMode] = useState(false);
   const [diabetesType, setDiabetesType] = useState("");
@@ -77,90 +76,95 @@ export default function HealthDataScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <Header></Header>
-      <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-        <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-      </TouchableOpacity>
+    <FormWrapper>
+      <View style={styles.container}>
+        {/* Header */}
+        <Header></Header>
+        <TouchableOpacity onPress={() => router.back()} style={styles.back}>
+          <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+        </TouchableOpacity>
 
-      {/* Avatar */}
-      <Image
-        source={require("../../assets/icons/profile.svg")}
-        style={styles.avatar}
-      />
-      <Text style={styles.name}>{profile?.fullName}</Text>
+        {/* Avatar */}
+        <Image
+          source={require("../../assets/icons/profile.svg")}
+          style={styles.avatar}
+        />
+        <Text style={styles.name}>{profile?.fullName}</Text>
 
-      {/* Data */}
-      <View style={styles.info}>
-        <Text style={styles.bold}>Diabetes Type:</Text>
-        {editMode ? (
-          <TextInput
-            value={diabetesType}
-            onChangeText={setDiabetesType}
-            style={styles.input}
-          />
-        ) : (
-          <Text style={styles.value}>{diabetesType || "Not available"}</Text>
-        )}
+        {/* Data */}
+        <View style={styles.info}>
+          <Text style={styles.bold}>Diabetes Type:</Text>
+          {editMode ? (
+            <TextInput
+              value={diabetesType}
+              onChangeText={setDiabetesType}
+              style={styles.input}
+            />
+          ) : (
+            <Text style={styles.value}>{diabetesType || "Not available"}</Text>
+          )}
 
-        <Text style={styles.bold}>Blood Type:</Text>
-        {editMode ? (
-          <TextInput
-            value={bloodType}
-            onChangeText={setBloodType}
-            style={styles.input}
-          />
-        ) : (
-          <Text style={styles.value}>
-            {profile?.bloodType || "Not available"}
-          </Text>
-        )}
+          <Text style={styles.bold}>Blood Type:</Text>
+          {editMode ? (
+            <TextInput
+              value={bloodType}
+              onChangeText={setBloodType}
+              style={styles.input}
+            />
+          ) : (
+            <Text style={styles.value}>
+              {profile?.bloodType || "Not available"}
+            </Text>
+          )}
 
-        <Text style={styles.bold}>Height:</Text>
-        {editMode ? (
-          <TextInput
-            value={height}
-            onChangeText={setHeight}
-            style={styles.input}
-          />
-        ) : (
-          <Text style={styles.value}>{profile?.height || "Not available"}</Text>
-        )}
+          <Text style={styles.bold}>Height:</Text>
+          {editMode ? (
+            <TextInput
+              value={height}
+              onChangeText={setHeight}
+              style={styles.input}
+            />
+          ) : (
+            <Text style={styles.value}>
+              {profile?.height || "Not available"}
+            </Text>
+          )}
 
-        <Text style={styles.bold}>Weight:</Text>
-        {editMode ? (
-          <TextInput
-            value={weight}
-            onChangeText={setWeight}
-            style={styles.input}
-          />
-        ) : (
-          <Text style={styles.value}>{profile?.weight || "Not available"}</Text>
-        )}
+          <Text style={styles.bold}>Weight:</Text>
+          {editMode ? (
+            <TextInput
+              value={weight}
+              onChangeText={setWeight}
+              style={styles.input}
+            />
+          ) : (
+            <Text style={styles.value}>
+              {profile?.weight || "Not available"}
+            </Text>
+          )}
 
-        <Text style={styles.bold}>Emergency Contact:</Text>
-        {editMode ? (
-          <TextInput
-            value={emergency}
-            onChangeText={setEmergency}
-            style={styles.input}
-          />
-        ) : (
-          <Text style={styles.value}>
-            {profile?.emergency || "Not available"}
-          </Text>
-        )}
+          <Text style={styles.bold}>Emergency Contact:</Text>
+          {editMode ? (
+            <TextInput
+              value={emergency}
+              onChangeText={setEmergency}
+              style={styles.input}
+            />
+          ) : (
+            <Text style={styles.value}>
+              {profile?.emergency || "Not available"}
+            </Text>
+          )}
+        </View>
 
+        <TouchableOpacity
+          onPress={() => (editMode ? handleSave() : setEditMode(true))}
+          style={styles.editButton}
+        >
+          <Text style={styles.editText}>{editMode ? "Save" : "Edit"}</Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        onPress={() => (editMode ? handleSave() : setEditMode(true))}
-        style={styles.editButton}
-      >
-        <Text style={styles.editText}>{editMode ? "Save" : "Edit"}</Text>
-      </TouchableOpacity>
-    </View>
+    </FormWrapper>
   );
 }
 
@@ -188,7 +192,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   info: { marginTop: 20, gap: 8 },
-  bold: { fontWeight: "bold", color: Colors.primary, fontSize:16 },
+  bold: { fontWeight: "bold", color: Colors.primary, fontSize: 16 },
   back: { marginTop: 24, alignSelf: "flex-start" },
   input: {
     borderColor: "#ccc",

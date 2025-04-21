@@ -17,6 +17,7 @@ import { db } from "../../firebase/config";
 import { useEffect, useState } from "react";
 import { updateDoc } from "firebase/firestore";
 import ActionButton from "@/components/ActionButton";
+import FormWrapper from "@/components/FormWrapper";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -80,76 +81,80 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <Header></Header>
+    <FormWrapper>
+      <View style={styles.container}>
+        {/* Header */}
+        <Header></Header>
 
-      {/* Avatar */}
-      <Image
-        source={require("../../assets/icons/profile.svg")}
-        style={styles.avatar}
-      />
-      <View style={styles.nameRow}>
-        <Text style={styles.name}>{profile?.fullName}</Text>
+        {/* Avatar */}
+        <Image
+          source={require("../../assets/icons/profile.svg")}
+          style={styles.avatar}
+        />
+        <View style={styles.nameRow}>
+          <Text style={styles.name}>{profile?.fullName}</Text>
+        </View>
+
+        {/* Details */}
+        <View style={styles.infoBox}>
+          <Text style={styles.infoText}>
+            <Text style={styles.label}>UID: </Text>
+            {user?.uid}
+          </Text>
+          <Text style={styles.label}>Email:</Text>
+          {editMode ? (
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+            />
+          ) : (
+            <Text style={styles.value}>{user?.email || "Not available"}</Text>
+          )}
+
+          <Text style={styles.label}>Phone Number:</Text>
+          {editMode ? (
+            <TextInput
+              value={phone}
+              onChangeText={setPhone}
+              style={styles.input}
+            />
+          ) : (
+            <Text style={styles.value}>
+              {profile?.phone || "Not available"}
+            </Text>
+          )}
+
+          <Text style={styles.infoText}>
+            <Text style={styles.label}>Language:</Text> English
+          </Text>
+        </View>
+        <View style={styles.buttonSection}>
+          <ActionButton
+            title="Health Info"
+            onPress={() => router.push("/profile/health-data")}
+          ></ActionButton>
+
+          <ActionButton
+            title="My Device"
+            onPress={() => router.push("/profile/device")}
+          ></ActionButton>
+
+          <TouchableOpacity
+            onPress={() => (editMode ? handleSave() : setEditMode(true))}
+            style={styles.editButton}
+          >
+            <Text style={styles.editText}>{editMode ? "Save" : "Edit"}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.logoutSection}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      {/* Details */}
-      <View style={styles.infoBox}>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>UID: </Text>
-          {user?.uid}
-        </Text>
-        <Text style={styles.label}>Email:</Text>
-        {editMode ? (
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
-        ) : (
-          <Text style={styles.value}>{user?.email || "Not available"}</Text>
-        )}
-
-        <Text style={styles.label}>Phone Number:</Text>
-        {editMode ? (
-          <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            style={styles.input}
-          />
-        ) : (
-          <Text style={styles.value}>{profile?.phone || "Not available"}</Text>
-        )}
-
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Language:</Text> English
-        </Text>
-      </View>
-      <View style={styles.buttonSection}>
-        <ActionButton
-          title="Health Info"
-          onPress={() => router.push("/profile/health-data")}
-        ></ActionButton>
-
-        <ActionButton
-          title="My Device"
-          onPress={() => router.push("/profile/device")}
-        ></ActionButton>
-        
-        <TouchableOpacity
-          onPress={() => (editMode ? handleSave() : setEditMode(true))}
-          style={styles.editButton}
-        >
-          <Text style={styles.editText}>{editMode ? "Save" : "Edit"}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.logoutSection}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </FormWrapper>
   );
 }
 

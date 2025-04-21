@@ -9,6 +9,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../firebase/config";
+import FormWrapper from "@/components/FormWrapper";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -25,6 +26,7 @@ export default function LoginScreen() {
   };
 
   return (
+    <FormWrapper>
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
 
@@ -44,6 +46,7 @@ export default function LoginScreen() {
         </Text>
       </TouchableOpacity>
     </View>
+    </FormWrapper>
   );
 }
 

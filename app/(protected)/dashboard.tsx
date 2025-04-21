@@ -4,45 +4,48 @@ import { Colors } from "../../constants/Colors";
 import { Logo } from "../../constants/Logo";
 import { useRouter } from "expo-router";
 import Header from "@/components/Header";
+import ScreenWrapper from "@/components/ScreenWrapper";
 
 export default function DashboardScreen() {
   const router = useRouter();
   return (
-    <View style={styles.container}>
-      <Header></Header>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        <Header></Header>
 
-      {/* Blood Glucose Reading */}
-      <View style={styles.glucoseContainer}>
-        <Text style={styles.glucoseValue}>100</Text>
-        <Text style={styles.unit}>mg/dL</Text>
-      </View>
-
-      {/* Date Bar */}
-      <View style={styles.dateRow}>
-        <Ionicons name="chevron-back" size={20} color={Colors.primary} />
-        <Text style={styles.dateText}>Today</Text>
-        <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
-      </View>
-
-      {/* Placeholder Chart */}
-      <View style={styles.chartContainer}>
-        <View style={styles.fakeChartCircle} />
-        <View style={styles.chartInfo}>
-          <Text style={styles.label}>Calories</Text>
-          <Text style={styles.value}>700</Text>
-          <Text style={styles.label}>Carbs</Text>
-          <Text style={styles.value}>12g</Text>
+        {/* Blood Glucose Reading */}
+        <View style={styles.glucoseContainer}>
+          <Text style={styles.glucoseValue}>100</Text>
+          <Text style={styles.unit}>mg/dL</Text>
         </View>
-      </View>
 
-      {/* See More Button */}
-      <TouchableOpacity
-        style={styles.seeMore}
-        onPress={() => router.push("/dashboard-details")}
-      >
-        <Text style={styles.seeMoreText}>See More</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Date Bar */}
+        <View style={styles.dateRow}>
+          <Ionicons name="chevron-back" size={20} color={Colors.primary} />
+          <Text style={styles.dateText}>Today</Text>
+          <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+        </View>
+
+        {/* Placeholder Chart */}
+        <View style={styles.chartContainer}>
+          <View style={styles.fakeChartCircle} />
+          <View style={styles.chartInfo}>
+            <Text style={styles.label}>Calories</Text>
+            <Text style={styles.value}>700</Text>
+            <Text style={styles.label}>Carbs</Text>
+            <Text style={styles.value}>12g</Text>
+          </View>
+        </View>
+
+        {/* See More Button */}
+        <TouchableOpacity
+          style={styles.seeMore}
+          onPress={() => router.push("/dashboard-details")}
+        >
+          <Text style={styles.seeMoreText}>See More</Text>
+        </TouchableOpacity>
+      </View>
+    </ScreenWrapper>
   );
 }
 

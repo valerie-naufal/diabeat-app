@@ -11,6 +11,7 @@ import {
 import { auth } from "../firebase/config";
 import { db } from "../firebase/config";
 import { doc, setDoc } from "firebase/firestore";
+import FormWrapper from "@/components/FormWrapper";
 
 export default function RegisterScreen() {
   const [fullName, setName] = useState("");
@@ -63,6 +64,7 @@ export default function RegisterScreen() {
   };
 
   return (
+    <FormWrapper>
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
 
@@ -123,6 +125,7 @@ export default function RegisterScreen() {
         </Text>
       </TouchableOpacity>
     </View>
+    </FormWrapper>
   );
 }
 
@@ -133,6 +136,7 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: "#fff",
     overflowY: "scroll",
+    
   },
   title: {
     fontSize: 28,

@@ -4,13 +4,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import { Logo } from "../../constants/Logo";
 import HeaderBlue from "../../components/HeaderBlue";
+import ScreenWrapper from "@/components/ScreenWrapper";
 
 const foodItems = [
   { id: "1", label: "Breakfast", item: "Cereal", calories: 200 },
@@ -26,40 +26,42 @@ export default function FoodLogsScreen() {
   const totalCalories = foodItems.reduce((acc, item) => acc + item.calories, 0);
 
   return (
-    <View style={styles.container}>
-      {/* Top Banner */}
-      <View style={styles.banner}>
-        <HeaderBlue></HeaderBlue>
-        <View style={styles.bannerFooter}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.bannerTitle}>Food</Text>
-          <View style={{ width: 24 }} /> {/* Spacer */}
-        </View>
-      </View>
-
-      {/* Food List */}
-      <FlatList
-        data={foodItems}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: 16 }}
-        renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            <View>
-              <Text style={styles.label}>{item.label}</Text>
-              <Text style={styles.sub}>
-                {item.item} - {item.calories} kcal
-              </Text>
-            </View>
-            <Ionicons name="trash-outline" size={24} color={Colors.primary} />
+    <ScreenWrapper>
+      <View style={styles.container}>
+        {/* Top Banner */}
+        <View style={styles.banner}>
+          <HeaderBlue></HeaderBlue>
+          <View style={styles.bannerFooter}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.bannerTitle}>Food</Text>
+            <View style={{ width: 24 }} /> {/* Spacer */}
           </View>
-        )}
-      />
+        </View>
 
-      {/* Total */}
-      <Text style={styles.total}>Total: {totalCalories} kcal</Text>
-    </View>
+        {/* Food List */}
+        <FlatList
+          data={foodItems}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ padding: 16 }}
+          renderItem={({ item }) => (
+            <View style={styles.itemRow}>
+              <View>
+                <Text style={styles.label}>{item.label}</Text>
+                <Text style={styles.sub}>
+                  {item.item} - {item.calories} kcal
+                </Text>
+              </View>
+              <Ionicons name="trash-outline" size={24} color={Colors.primary} />
+            </View>
+          )}
+        />
+
+        {/* Total */}
+        <Text style={styles.total}>Total: {totalCalories} kcal</Text>
+      </View>
+    </ScreenWrapper>
   );
 }
 

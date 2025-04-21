@@ -4,12 +4,12 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
 import HeaderBlue from "@/components/HeaderBlue";
+import ScreenWrapper from "@/components/ScreenWrapper";
 
 const insulinLogs = [
   { id: "1", value: 1, type: "Basal" },
@@ -24,35 +24,37 @@ export default function InsulinLogsScreen() {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.banner}>
-        <HeaderBlue></HeaderBlue>
-        <View style={styles.bannerBottom}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Insulin</Text>
-          <View style={{ width: 24 }} />
-        </View>
-      </View>
-
-      {/* List */}
-      <FlatList
-        data={insulinLogs}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: 16 }}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.timestamp}>2/23/25{"\n"}15:47:05</Text>
-            <Text style={styles.value}>
-              {item.value} unit{item.value > 1 ? "s" : ""}
-            </Text>
-            <Text style={styles.type}>{item.type}</Text>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.banner}>
+          <HeaderBlue></HeaderBlue>
+          <View style={styles.bannerBottom}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Insulin</Text>
+            <View style={{ width: 24 }} />
           </View>
-        )}
-      />
-    </View>
+        </View>
+
+        {/* List */}
+        <FlatList
+          data={insulinLogs}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ padding: 16 }}
+          renderItem={({ item }) => (
+            <View style={styles.item}>
+              <Text style={styles.timestamp}>2/23/25{"\n"}15:47:05</Text>
+              <Text style={styles.value}>
+                {item.value} unit{item.value > 1 ? "s" : ""}
+              </Text>
+              <Text style={styles.type}>{item.type}</Text>
+            </View>
+          )}
+        />
+      </View>
+    </ScreenWrapper>
   );
 }
 

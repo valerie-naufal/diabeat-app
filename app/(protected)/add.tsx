@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import Header from "@/components/Header";
+import ScreenWrapper from "@/components/ScreenWrapper";
 
 const options = [
   { label: "Breakfast", icon: require("../../assets/icons/breakfast.svg") },
@@ -16,22 +17,24 @@ export default function AddScreen() {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      <Header></Header>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        <Header></Header>
 
-      <View style={styles.grid}>
-        {options.map((item) => (
-          <TouchableOpacity
-            key={item.label}
-            style={styles.item}
-            onPress={() => router.push("/modal-search")}
-          >
-            <Image source={item.icon} style={styles.icon} />
-            <Text style={styles.label}>{item.label}</Text>
-          </TouchableOpacity>
-        ))}
+        <View style={styles.grid}>
+          {options.map((item) => (
+            <TouchableOpacity
+              key={item.label}
+              style={styles.item}
+              onPress={() => router.push("/modal-search")}
+            >
+              <Image source={item.icon} style={styles.icon} />
+              <Text style={styles.label}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
-    </View>
+    </ScreenWrapper>
   );
 }
 
@@ -41,7 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 24,
     paddingTop: 40,
-    overflowY: "scroll"
+    overflowY: "scroll",
   },
   header: {
     flexDirection: "row",

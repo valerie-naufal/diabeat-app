@@ -9,6 +9,7 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "@/components/Header";
 import { Colors } from "@/constants/Colors";
+import ScreenWrapper from "@/components/ScreenWrapper";
 
 export default function LogsScreen() {
   const router = useRouter();
@@ -32,34 +33,36 @@ export default function LogsScreen() {
   ] as const;
 
   return (
-    <View style={styles.container}>
-      <Header></Header>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        <Header></Header>
 
-      {cards.map((card) => (
-        <TouchableOpacity
-          key={card.label}
-          onPress={() => router.push(card.route)}
-          style={styles.cardWrapper}
-        >
-          <ImageBackground
-            source={card.image}
-            style={styles.cardImage}
-            imageStyle={{ borderRadius: 16, resizeMode: "cover" }}
+        {cards.map((card) => (
+          <TouchableOpacity
+            key={card.label}
+            onPress={() => router.push(card.route)}
+            style={styles.cardWrapper}
           >
-            <LinearGradient
-              colors={[
-                "transparent",
-                "rgba(180, 210, 255, 0.4)",
-                "rgba(180, 210, 255, 0.8)",
-              ]}
-              style={styles.overlay}
+            <ImageBackground
+              source={card.image}
+              style={styles.cardImage}
+              imageStyle={{ borderRadius: 16, resizeMode: "cover" }}
             >
-              <Text style={styles.label}>{card.label}</Text>
-            </LinearGradient>
-          </ImageBackground>
-        </TouchableOpacity>
-      ))}
-    </View>
+              <LinearGradient
+                colors={[
+                  "transparent",
+                  "rgba(180, 210, 255, 0.4)",
+                  "rgba(180, 210, 255, 0.8)",
+                ]}
+                style={styles.overlay}
+              >
+                <Text style={styles.label}>{card.label}</Text>
+              </LinearGradient>
+            </ImageBackground>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScreenWrapper>
   );
 }
 

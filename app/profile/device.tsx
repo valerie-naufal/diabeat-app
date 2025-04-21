@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
@@ -15,6 +8,7 @@ import { auth } from "../../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import ActionButton from "@/components/ActionButton";
+import ScreenWrapper from "@/components/ScreenWrapper";
 
 const device = {
   number: "HSUW34WHW",
@@ -44,32 +38,33 @@ export default function DeviceScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Header></Header>
-      <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-        <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-      </TouchableOpacity>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        <Header></Header>
+        <TouchableOpacity onPress={() => router.back()} style={styles.back}>
+          <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+        </TouchableOpacity>
 
-      <Image
-        source={require("../../assets/icons/profile.svg")}
-        style={styles.avatar}
-      />
-      <Text style={styles.name}>{profile?.fullName}</Text>
+        <Image
+          source={require("../../assets/icons/profile.svg")}
+          style={styles.avatar}
+        />
+        <Text style={styles.name}>{profile?.fullName}</Text>
 
-      <Text style={styles.label}>
-        <Text style={styles.bold}>Device Number:</Text> {device.number}
-      </Text>
-      <Text style={styles.label}>
-        <Text style={styles.bold}>Connection:</Text>{" "}
-        <Text style={{ color: "green" }}>{device.status}</Text>
-      </Text>
+        <Text style={styles.label}>
+          <Text style={styles.bold}>Device Number:</Text> {device.number}
+        </Text>
+        <Text style={styles.label}>
+          <Text style={styles.bold}>Connection:</Text>{" "}
+          <Text style={{ color: "green" }}>{device.status}</Text>
+        </Text>
 
-      <ActionButton
-        title="Connect Device"
-        onPress={() => router.push("/profile")}
-      ></ActionButton>
-      
-    </View>
+        <ActionButton
+          title="Connect Device"
+          onPress={() => router.push("/profile")}
+        ></ActionButton>
+      </View>
+    </ScreenWrapper>
   );
 }
 

@@ -10,12 +10,14 @@ import {
 import { ReactNode } from "react";
 
 export default function FormWrapper({ children }: { children: ReactNode }) {
+  const isWeb = Platform.OS === "web";
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1 }}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      {isWeb ? (
         <View style={{ flex: 1 }}>
           <ScrollView
             contentContainerStyle={styles.container}
@@ -24,7 +26,18 @@ export default function FormWrapper({ children }: { children: ReactNode }) {
             {children}
           </ScrollView>
         </View>
-      </TouchableWithoutFeedback>
+      ) : (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={{ flex: 1 }}>
+            <ScrollView
+              contentContainerStyle={styles.container}
+              keyboardShouldPersistTaps="handled"
+            >
+              {children}
+            </ScrollView>
+          </View>
+        </TouchableWithoutFeedback>
+      )}
     </KeyboardAvoidingView>
   );
 }

@@ -25,6 +25,7 @@ interface InsulinLog {
 export default function InsulinLogsScreen() {
   const router = useRouter();
   const [logs, setLogs] = useState<InsulinLog[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -48,6 +49,31 @@ export default function InsulinLogsScreen() {
 
     fetchLogs();
   }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    const user = auth.currentUser;
+    if (!user) {
+      setRefreshing(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, "insulinLogs"),
+      where("user", "==", user.uid),
+      orderBy("timestamp", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Omit<InsulinLog, "id">),
+    }));
+
+    setLogs(data);
+    setRefreshing(false);
+  };
 
   return (
     <ScreenWrapper>
@@ -78,6 +104,11 @@ export default function InsulinLogsScreen() {
                 {item.value} unit{item.value > 1 ? "s" : ""}
               </Text>
               <Text style={styles.type}>{item.type}</Text>
+            </View>
+          )}
+          ListEmptyComponent={() => (
+            <View style={{ alignItems: "center", marginTop: 20 }}>
+              <Text>No logs found.</Text>
             </View>
           )}
         />

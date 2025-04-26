@@ -32,8 +32,8 @@ export default function GlucoseLogsScreen() {
   const router = useRouter();
   const [logs, setLogs] = useState<GlucoseLog[]>([]);
   const user = auth.currentUser;
-  console.log(user?.uid);
-
+  const [refreshing, setRefreshing] = useState(false);
+ 
   useEffect(() => {
     const fetchLogs = async () => {
       if (!user) return;
@@ -59,6 +59,31 @@ export default function GlucoseLogsScreen() {
     fetchLogs();
   }, []);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    const user = auth.currentUser;
+    if (!user) {
+      setRefreshing(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, "glucoseLogs"),
+      where("user", "==", user.uid),
+      orderBy("timestamp", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Omit<GlucoseLog, "id">),
+    }));
+
+    setLogs(data);
+    setRefreshing(false);
+  };
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -79,6 +104,7 @@ export default function GlucoseLogsScreen() {
           data={logs}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16 }}
+          onRefresh={handleRefresh}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.timestamp}>
@@ -91,6 +117,11 @@ export default function GlucoseLogsScreen() {
                   { backgroundColor: getColorForValue(item.value) },
                 ]}
               />
+            </View>
+          )}
+          ListEmptyComponent={() => (
+            <View style={{ alignItems: "center", marginTop: 20 }}>
+              <Text>No logs found.</Text>
             </View>
           )}
         />

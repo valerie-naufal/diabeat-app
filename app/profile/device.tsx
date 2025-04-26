@@ -59,10 +59,12 @@ export default function DeviceScreen() {
           <Text style={{ color: "green" }}>{device.status}</Text>
         </Text>
 
-        <ActionButton
-          title="Connect Device"
+        <TouchableOpacity
+          style={styles.button}
           onPress={() => router.push("/profile")}
-        ></ActionButton>
+        >
+          <Text style={styles.buttonText}>Coonnect Device</Text>
+        </TouchableOpacity>
       </View>
     </ScreenWrapper>
   );
@@ -89,11 +91,11 @@ const styles = StyleSheet.create({
   bold: { fontWeight: "bold", color: Colors.primary },
   button: {
     backgroundColor: Colors.primary,
-    padding: 14,
+    paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
-    marginTop: 16,
+    marginTop: 50,
   },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
   back: { marginTop: 24, alignSelf: "flex-start" },
 });

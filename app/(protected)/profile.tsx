@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 20,
-    width: "15%",
+    width: "100%",
   },
   logoutText: {
     color: "#fff",
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 6,
-    width: "10%",
+    width: "30%",
   },
   editText: {
     color: "#fff",

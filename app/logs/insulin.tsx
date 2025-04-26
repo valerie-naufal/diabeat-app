@@ -53,27 +53,33 @@ export default function InsulinLogsScreen() {
   const handleRefresh = async () => {
     setRefreshing(true);
 
-    const user = auth.currentUser;
-    if (!user) {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        setRefreshing(false);
+        return;
+      }
+
+      const q = query(
+        collection(db, "foodLogs"),
+        where("user", "==", user.uid),
+        orderBy("timestamp", "desc")
+      );
+
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<InsulinLog, "id">),
+      }));
+
+      setLogs(data);
+    } catch (error) {
+      console.error("Error refreshing food logs:", error);
+    } finally {
       setRefreshing(false);
-      return;
     }
-
-    const q = query(
-      collection(db, "insulinLogs"),
-      where("user", "==", user.uid),
-      orderBy("timestamp", "desc")
-    );
-
-    const snapshot = await getDocs(q);
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<InsulinLog, "id">),
-    }));
-
-    setLogs(data);
-    setRefreshing(false);
   };
+
 
   return (
     <ScreenWrapper>
@@ -95,6 +101,8 @@ export default function InsulinLogsScreen() {
           data={logs}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16 }}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.timestamp}>

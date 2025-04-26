@@ -104,6 +104,7 @@ export default function GlucoseLogsScreen() {
           data={logs}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16 }}
+          refreshing={refreshing}
           onRefresh={handleRefresh}
           renderItem={({ item }) => (
             <View style={styles.card}>

@@ -75,14 +75,34 @@ export default function FoodLogsScreen() {
     setRefreshing(false);
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteDoc(doc(db, "foodLogs", id));
-      fetchLogs(); // Refresh after deleting
-    } catch (error) {
-      console.error("Error deleting log:", error);
-      Alert.alert("Error", "Failed to delete the log. Please try again.");
-    }
+  const handleDelete = (id: string) => {
+    Alert.alert(
+      "Delete Entry",
+      "Are you sure you want to delete this food log?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, "foodLogs", id));
+              fetchLogs();
+            } catch (error) {
+              console.error("Error deleting log:", error);
+              Alert.alert(
+                "Error",
+                "Failed to delete the log. Please try again."
+              );
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (

@@ -10,18 +10,76 @@ import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
 import HeaderBlue from "@/components/HeaderBlue";
 import ScreenWrapper from "@/components/ScreenWrapper";
+import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { auth } from "../../firebase/config";
+import { useEffect, useState } from "react";
 
-const insulinLogs = [
-  { id: "1", value: 1, type: "Basal" },
-  { id: "2", value: 2, type: "Bolus" },
-  { id: "3", value: 1, type: "Basal" },
-  { id: "4", value: 3, type: "Bolus" },
-  { id: "5", value: 1, type: "Basal" },
-  { id: "6", value: 2, type: "Bolus" },
-];
+interface InsulinLog {
+  id: string;
+  value: number;
+  type: string;
+  timestamp: any;
+}
 
 export default function InsulinLogsScreen() {
   const router = useRouter();
+  const [logs, setLogs] = useState<InsulinLog[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const q = query(
+        collection(db, "insulinLogs"),
+        where("user", "==", user.uid),
+        orderBy("timestamp", "desc")
+      );
+
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<InsulinLog, "id">),
+      }));
+
+      setLogs(data);
+    };
+
+    fetchLogs();
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        setRefreshing(false);
+        return;
+      }
+
+      const q = query(
+        collection(db, "foodLogs"),
+        where("user", "==", user.uid),
+        orderBy("timestamp", "desc")
+      );
+
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<InsulinLog, "id">),
+      }));
+
+      setLogs(data);
+    } catch (error) {
+      console.error("Error refreshing food logs:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
 
   return (
     <ScreenWrapper>
@@ -40,16 +98,25 @@ export default function InsulinLogsScreen() {
 
         {/* List */}
         <FlatList
-          data={insulinLogs}
+          data={logs}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16 }}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
           renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text style={styles.timestamp}>2/23/25{"\n"}15:47:05</Text>
+            <View style={styles.card}>
+              <Text style={styles.timestamp}>
+                {new Date(item.timestamp.toDate()).toLocaleString()}
+              </Text>
               <Text style={styles.value}>
                 {item.value} unit{item.value > 1 ? "s" : ""}
               </Text>
               <Text style={styles.type}>{item.type}</Text>
+            </View>
+          )}
+          ListEmptyComponent={() => (
+            <View style={{ alignItems: "center", marginTop: 20 }}>
+              <Text>No logs found.</Text>
             </View>
           )}
         />
@@ -77,7 +144,15 @@ const styles = StyleSheet.create({
   icon: { width: 28, height: 28, resizeMode: "contain" },
   greeting: { color: "#fff", fontWeight: "600" },
   title: { fontSize: 20, color: "#fff", fontWeight: "bold" },
-
+  card: {
+    padding: 16,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 10,
+    marginBottom: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   item: {
     flexDirection: "row",
     justifyContent: "space-between",

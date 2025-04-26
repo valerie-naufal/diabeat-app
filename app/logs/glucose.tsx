@@ -10,31 +10,79 @@ import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
 import HeaderBlue from "@/components/HeaderBlue";
 import ScreenWrapper from "@/components/ScreenWrapper";
+import { useEffect, useState } from "react";
+import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { auth } from "../../firebase/config";
 
-const glucoseLogs = [
-  { id: "1", value: 100, status: "normal" },
-  { id: "2", value: 103, status: "normal" },
-  { id: "3", value: 98, status: "normal" },
-  { id: "4", value: 300, status: "high" },
-  { id: "5", value: 200, status: "elevated" },
-  { id: "6", value: 100, status: "normal" },
-];
+interface GlucoseLog {
+  id: string;
+  value: number;
+  timestamp: any;
+}
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "normal":
-      return "green";
-    case "high":
-      return "red";
-    case "elevated":
-      return "orange";
-    default:
-      return "gray";
-  }
+const getColorForValue = (value: number) => {
+  if (value > 200) return "#E53935"; // red
+  if (value >= 150 && value <= 200) return "#FBC02D"; // yellow
+  if (value >= 70 && value < 150) return "#43A047"; // green
+  return "#FBC02D"; // yellow for < 70
 };
 
 export default function GlucoseLogsScreen() {
   const router = useRouter();
+  const [logs, setLogs] = useState<GlucoseLog[]>([]);
+  const user = auth.currentUser;
+  const [refreshing, setRefreshing] = useState(false);
+ 
+  useEffect(() => {
+    const fetchLogs = async () => {
+      if (!user) return;
+
+      const q = query(
+        collection(db, "glucoseLogs"),
+        where("user", "==", user?.uid),
+        orderBy("timestamp", "desc")
+      );
+
+      try {
+        const querySnapshot = await getDocs(q);
+        const data: GlucoseLog[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<GlucoseLog, "id">),
+        }));
+        setLogs(data);
+      } catch (err: any) {
+        console.error("Firestore error:", err.message);
+      }
+    };
+
+    fetchLogs();
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    const user = auth.currentUser;
+    if (!user) {
+      setRefreshing(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, "glucoseLogs"),
+      where("user", "==", user.uid),
+      orderBy("timestamp", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Omit<GlucoseLog, "id">),
+    }));
+
+    setLogs(data);
+    setRefreshing(false);
+  };
 
   return (
     <ScreenWrapper>
@@ -53,19 +101,28 @@ export default function GlucoseLogsScreen() {
 
         {/* List */}
         <FlatList
-          data={glucoseLogs}
+          data={logs}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16 }}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
           renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text style={styles.timestamp}>2/23/25{"\n"}15:47:05</Text>
+            <View style={styles.card}>
+              <Text style={styles.timestamp}>
+                {new Date(item.timestamp.toDate()).toLocaleString()}
+              </Text>
               <Text style={styles.value}>{item.value} mg/dL</Text>
               <View
                 style={[
                   styles.statusDot,
-                  { backgroundColor: getStatusColor(item.status) },
+                  { backgroundColor: getColorForValue(item.value) },
                 ]}
               />
+            </View>
+          )}
+          ListEmptyComponent={() => (
+            <View style={{ alignItems: "center", marginTop: 20 }}>
+              <Text>No logs found.</Text>
             </View>
           )}
         />
@@ -75,7 +132,7 @@ export default function GlucoseLogsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", overflowY: "scroll" },
+  container: { flex: 1, backgroundColor: "#fff", },
   banner: {
     backgroundColor: Colors.primary,
     padding: 16,
@@ -101,6 +158,15 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
     borderBottomWidth: 0.5,
     paddingVertical: 16,
+  },
+  card: {
+    padding: 16,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 10,
+    marginBottom: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   timestamp: { color: Colors.primary, fontSize: 14 },
   value: { color: Colors.primary, fontWeight: "600", fontSize: 16 },

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -11,19 +12,78 @@ import { Colors } from "../../constants/Colors";
 import { Logo } from "../../constants/Logo";
 import HeaderBlue from "../../components/HeaderBlue";
 import ScreenWrapper from "@/components/ScreenWrapper";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { auth } from "../../firebase/config";
+import { useEffect, useState } from "react";
 
-const foodItems = [
-  { id: "1", label: "Breakfast", item: "Cereal", calories: 200 },
-  { id: "2", label: "Snack 1", item: "Banana", calories: 100 },
-  { id: "3", label: "Lunch", item: "Pizza", calories: 550 },
-  { id: "4", label: "Snack 2", item: "Almonds", calories: 100 },
-  { id: "5", label: "Dinner", item: "Sandwich", calories: 200 },
-];
+interface FoodLog {
+  id: string;
+  name: string;
+  calories: number;
+  carbs: number;
+  meal: string;
+  date: any;
+}
 
 export default function FoodLogsScreen() {
   const router = useRouter();
+  const [logs, setLogs] = useState<FoodLog[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const totalCalories = foodItems.reduce((acc, item) => acc + item.calories, 0);
+  const fetchLogs = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const q = query(
+      collection(db, "foodLogs"),
+      where("user", "==", user.uid),
+      orderBy("date", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Omit<FoodLog, "id">),
+    }));
+
+    setLogs(data);
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const totalCalories = logs.reduce(
+    (acc, item) => acc + (item.calories ?? 0),
+    0
+  );
+
+  const totalCarbs = logs.reduce((acc, item) => acc + (item.carbs ?? 0), 0);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchLogs();
+    setRefreshing(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "foodLogs", id));
+      fetchLogs(); // Refresh after deleting
+    } catch (error) {
+      console.error("Error deleting log:", error);
+      Alert.alert("Error", "Failed to delete the log. Please try again.");
+    }
+  };
 
   return (
     <ScreenWrapper>
@@ -39,34 +99,49 @@ export default function FoodLogsScreen() {
             <View style={{ width: 24 }} /> {/* Spacer */}
           </View>
         </View>
-
-        {/* Food List */}
-        <FlatList
-          data={foodItems}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16 }}
-          renderItem={({ item }) => (
-            <View style={styles.itemRow}>
-              <View>
-                <Text style={styles.label}>{item.label}</Text>
-                <Text style={styles.sub}>
-                  {item.item} - {item.calories} kcal
-                </Text>
+        <View style={{ flex: 1 }}>
+          {/* Food List */}
+          <FlatList
+            data={logs}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ padding: 16 }}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            renderItem={({ item }) => (
+              <View style={styles.itemRow}>
+                <View>
+                  <Text style={styles.label}>{item.meal || "Meal"}</Text>
+                  <Text style={styles.sub}>
+                    {item.name || ""} - {item.calories ?? 0} kcal
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                  <Ionicons
+                    name="trash-outline"
+                    size={24}
+                    color={Colors.primary}
+                  />
+                </TouchableOpacity>
               </View>
-              <Ionicons name="trash-outline" size={24} color={Colors.primary} />
-            </View>
-          )}
-        />
+            )}
+            ListEmptyComponent={() => (
+              <View style={{ alignItems: "center", marginTop: 20 }}>
+                <Text>No food logs found.</Text>
+              </View>
+            )}
+          />
+          <Text style={styles.total}>Total Calories: {totalCalories} kcal</Text>
+          <Text style={styles.total}>Total Carbs: {totalCarbs} g</Text>
+        </View>
 
         {/* Total */}
-        <Text style={styles.total}>Total: {totalCalories} kcal</Text>
       </View>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", overflowY: "scroll" },
+  container: { flex: 1, backgroundColor: "#fff" },
   banner: {
     backgroundColor: Colors.primary,
     padding: 16,

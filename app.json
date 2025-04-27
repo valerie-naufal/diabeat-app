@@ -9,9 +9,20 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSBluetoothAlwaysUsageDescription": "This app uses Bluetooth to connect to nearby devices.",
+        "NSBluetoothPeripheralUsageDescription": "This app uses Bluetooth to connect to nearby devices."
+      }
     },
     "android": {
+      "permissions": [
+        "BLUETOOTH",
+        "BLUETOOTH_ADMIN",
+        "BLUETOOTH_SCAN",
+        "BLUETOOTH_CONNECT",
+        "ACCESS_FINE_LOCATION"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -31,6 +42,12 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-bluetooth",
+        {
+          "isBackgroundEnabled": true
         }
       ]
     ],

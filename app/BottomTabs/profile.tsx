@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../../types";
 import { Colors } from "../../constants/Colors";
 import Header from "../../components/Header";
 import { signOut } from "firebase/auth";
@@ -19,8 +20,10 @@ import { updateDoc } from "firebase/firestore";
 import ActionButton from "@/components/ActionButton";
 import FormWrapper from "@/components/FormWrapper";
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Profile">;
+const router = useNavigation<NavigationProp>();
+
 export default function ProfileScreen() {
-  const router = useRouter();
   const user = auth.currentUser;
   const [profile, setProfile] = useState<any>(null);
   const [editMode, setEditMode] = useState(false);
@@ -74,7 +77,7 @@ export default function ProfileScreen() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.replace("/login");
+      router.replace("Login");
     } catch (err: any) {
       alert("Logout failed: " + err.message);
     }
@@ -132,12 +135,12 @@ export default function ProfileScreen() {
         <View style={styles.buttonSection}>
           <ActionButton
             title="Health Info"
-            onPress={() => router.push("/profile/health-data")}
+            onPress={() => router.navigate("HealthData")}
           ></ActionButton>
 
           <ActionButton
             title="My Device"
-            onPress={() => router.push("/profile/device")}
+            onPress={() => router.push("Device")}
           ></ActionButton>
 
           <TouchableOpacity

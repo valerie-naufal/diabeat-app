@@ -1,16 +1,22 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../types";
 import { View, ActivityIndicator } from "react-native";
 import { useAuth } from "../hooks/useAuth"; // or your own auth logic
 
 export default function Index() {
-  const router = useRouter();
+  type NavigationProp = NativeStackNavigationProp<
+    RootStackParamList,
+    "Index"
+  >;
+  const router = useNavigation<NavigationProp>();
   const { isLoggedIn, loading } = useAuth();
 
   useEffect(() => {
     if (loading) return;
-    if (isLoggedIn) router.replace("/dashboard");
-    else router.replace("/login");
+    if (isLoggedIn) router.replace("Dashboard");
+    else router.replace("Login");
   }, [loading, isLoggedIn]);
 
   return (

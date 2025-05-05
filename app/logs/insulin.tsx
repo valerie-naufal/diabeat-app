@@ -7,13 +7,13 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
-import { useRouter } from "expo-router";
 import HeaderBlue from "@/components/HeaderBlue";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { auth } from "../../firebase/config";
 import { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 interface InsulinLog {
   id: string;
@@ -23,7 +23,7 @@ interface InsulinLog {
 }
 
 export default function InsulinLogsScreen() {
-  const router = useRouter();
+  const router = useNavigation();
   const [logs, setLogs] = useState<InsulinLog[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -88,7 +88,7 @@ export default function InsulinLogsScreen() {
         <View style={styles.banner}>
           <HeaderBlue></HeaderBlue>
           <View style={styles.bannerBottom}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.goBack()}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.title}>Insulin</Text>

@@ -2,24 +2,23 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import InputField from "../components/InputField";
 import ActionButton from "../components/ActionButton";
-import { Colors } from "../constants/Colors";
-import { useRouter } from "expo-router";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../types";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/config";
 import FormWrapper from "@/components/FormWrapper";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
+  type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Login">;
+  const router = useNavigation<NavigationProp>();
 
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      router.replace("/dashboard");
+      router.replace("Dashboard");
     } catch (err: any) {
       alert("Login failed: " + err.message);
     }
@@ -27,25 +26,25 @@ export default function LoginScreen() {
 
   return (
     <FormWrapper>
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome Back</Text>
 
-      <InputField placeholder="Email" value={email} onChangeText={setEmail} />
-      <InputField
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <InputField placeholder="Email" value={email} onChangeText={setEmail} />
+        <InputField
+          placeholder="Password"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
 
-      <ActionButton title="Login" onPress={handleLogin} />
+        <ActionButton title="Login" onPress={handleLogin} />
 
-      <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.signupText}>
-          Don't have an account? <Text style={styles.link}>Sign up</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity onPress={() => router.push("Register")}>
+          <Text style={styles.signupText}>
+            Don't have an account? <Text style={styles.link}>Sign up</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
     </FormWrapper>
   );
 }
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 24,
     backgroundColor: "fff",
-    overflowY: "scroll"
+    overflowY: "scroll",
   },
   title: {
     fontSize: 28,

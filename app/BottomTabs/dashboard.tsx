@@ -2,12 +2,17 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { Logo } from "../../constants/Logo";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../../types";
 import Header from "@/components/Header";
 import ScreenWrapper from "@/components/ScreenWrapper";
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Dashboard">;
+const router = useNavigation<NavigationProp>();
+
 export default function DashboardScreen() {
-  const router = useRouter();
+  
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -40,7 +45,7 @@ export default function DashboardScreen() {
         {/* See More Button */}
         <TouchableOpacity
           style={styles.seeMore}
-          onPress={() => router.push("/dashboard-details")}
+          onPress={() => router.navigate("DashboardDetails")}
         >
           <Text style={styles.seeMoreText}>See More</Text>
         </TouchableOpacity>

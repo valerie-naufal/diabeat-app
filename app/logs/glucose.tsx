@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import HeaderBlue from "@/components/HeaderBlue";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useEffect, useState } from "react";
@@ -29,7 +29,7 @@ const getColorForValue = (value: number) => {
 };
 
 export default function GlucoseLogsScreen() {
-  const router = useRouter();
+  const router = useNavigation();
   const [logs, setLogs] = useState<GlucoseLog[]>([]);
   const user = auth.currentUser;
   const [refreshing, setRefreshing] = useState(false);
@@ -91,7 +91,7 @@ export default function GlucoseLogsScreen() {
         <View style={styles.banner}>
           <HeaderBlue></HeaderBlue>
           <View style={styles.bannerBottom}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.goBack()}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.title}>Glucose</Text>

@@ -1,8 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import Header from "@/components/Header";
 import ScreenWrapper from "@/components/ScreenWrapper";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../types'; 
 
 const options = [
   { label: "Breakfast", icon: require("../../assets/icons/breakfast.svg") },
@@ -13,8 +15,10 @@ const options = [
   { label: "Measurements", icon: require("../../assets/icons/ruler.svg") },
 ];
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Add">;
+const router = useNavigation<NavigationProp>();
+
 export default function AddScreen() {
-  const router = useRouter();
 
   return (
     <ScreenWrapper>
@@ -26,7 +30,7 @@ export default function AddScreen() {
             <TouchableOpacity
               key={item.label}
               style={styles.item}
-              onPress={() => router.push("/modal-search")}
+              onPress={() => router.navigate("ModalSearch")}
             >
               <Image source={item.icon} style={styles.icon} />
               <Text style={styles.label}>{item.label}</Text>

@@ -7,7 +7,7 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import { Colors } from "../../constants/Colors";
 import { Logo } from "../../constants/Logo";
 import HeaderBlue from "../../components/HeaderBlue";
@@ -35,7 +35,7 @@ interface FoodLog {
 }
 
 export default function FoodLogsScreen() {
-  const router = useRouter();
+  const router = useNavigation();
   const [logs, setLogs] = useState<FoodLog[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -112,7 +112,7 @@ export default function FoodLogsScreen() {
         <View style={styles.banner}>
           <HeaderBlue></HeaderBlue>
           <View style={styles.bannerFooter}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.goBack()}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.bannerTitle}>Food</Text>

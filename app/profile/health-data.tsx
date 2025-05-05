@@ -8,7 +8,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../../types";
 import { auth } from "../../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
@@ -17,8 +19,10 @@ import Header from "@/components/Header";
 import { updateDoc } from "firebase/firestore";
 import FormWrapper from "@/components/FormWrapper";
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "HealthData">;
+const router = useNavigation<NavigationProp>();
+
 export default function HealthDataScreen() {
-  const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
   const [editMode, setEditMode] = useState(false);
   const [diabetesType, setDiabetesType] = useState("");
@@ -80,7 +84,7 @@ export default function HealthDataScreen() {
       <View style={styles.container}>
         {/* Header */}
         <Header></Header>
-        <TouchableOpacity onPress={() => router.back()} style={styles.back}>
+        <TouchableOpacity onPress={() => router.goBack()} style={styles.back}>
           <Ionicons name="arrow-back" size={24} color={Colors.primary} />
         </TouchableOpacity>
 

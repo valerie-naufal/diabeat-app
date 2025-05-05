@@ -3,9 +3,10 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../types";
 import { LineChart } from "react-native-chart-kit";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../constants/Colors";
@@ -23,8 +24,10 @@ const data = {
   ],
 };
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "DashboardDetails">;
+const router = useNavigation<NavigationProp>();
+
 export default function DashboardDetailsScreen() {
-  const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -54,7 +57,7 @@ export default function DashboardDetailsScreen() {
             name="arrow-back"
             size={24}
             color="#fff"
-            onPress={() => router.back()}
+            onPress={() => router.goBack()}
           />
           <Text style={styles.headerText}>
             100 <Text style={styles.unit}>mg/dL</Text>

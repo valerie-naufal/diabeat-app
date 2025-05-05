@@ -5,29 +5,32 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../../types";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "@/components/Header";
 import { Colors } from "@/constants/Colors";
 import ScreenWrapper from "@/components/ScreenWrapper";
 
-export default function LogsScreen() {
-  const router = useRouter();
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Logs">;
+const router = useNavigation<NavigationProp>();
 
+export default function LogsScreen() {
   const cards = [
     {
       label: "Food",
-      route: "/logs/food",
+      route: "Food",
       image: require("../../assets/images/food-bg.jpg"),
     },
     {
       label: "Glucose",
-      route: "/logs/glucose",
+      route: "Glucose",
       image: require("../../assets/images/glucose-bg.jpg"),
     },
     {
       label: "Insulin",
-      route: "/logs/insulin",
+      route: "Insulin",
       image: require("../../assets/images/insulin-bg.jpg"),
     },
   ] as const;
@@ -40,7 +43,7 @@ export default function LogsScreen() {
         {cards.map((card) => (
           <TouchableOpacity
             key={card.label}
-            onPress={() => router.push(card.route)}
+            onPress={() => router.navigate(card.route)}
             style={styles.cardWrapper}
           >
             <ImageBackground

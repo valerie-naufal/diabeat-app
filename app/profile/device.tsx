@@ -1,23 +1,78 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../../types";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { auth } from "../../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
-import ActionButton from "@/components/ActionButton";
 import ScreenWrapper from "@/components/ScreenWrapper";
+import { PermissionsAndroid, Platform } from "react-native";
+import RNBluetoothClassic from "react-native-bluetooth-classic";
 
 const device = {
   number: "HSUW34WHW",
   status: "Connected",
 };
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Device">;
+const router = useNavigation<NavigationProp>();
+
 export default function DeviceScreen() {
-  const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
+  const requestBluetoothPermissions = async () => {
+    if (Platform.OS === "android") {
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      ]);
+      console.log("Permission results:", granted);
+    }
+  };
+  const connectToPico = async () => {
+    try {
+      const devices = await RNBluetoothClassic.getBondedDevices();
+      console.log("Paired devices:", devices);
+
+      const pico = devices.find(
+        (d) =>
+          d.name.includes("PicoW Sensor") ||
+          d.name.includes("PicoW-Belt") ||
+          d.address === "XX:XX:XX:XX:XX:XX"
+      );
+      if (!pico) {
+        console.log("Pico not found");
+        return;
+      }
+
+      const connected = await pico.connect();
+      console.log("Connected:", connected);
+
+      // Listen to data
+      pico.onDataReceived((event) => {
+        console.log("Data received from Pico:", event.data);
+      });
+
+      // To write to the Pico:
+      await pico.write("Hello from React Native!\n");
+    } catch (err) {
+      console.error("Bluetooth error:", err);
+    }
+  };
+  const writeToSecondPico = async (data: string) => {
+    const devices = await RNBluetoothClassic.getBondedDevices();
+    const picoOut = devices.find((d) => d.name.includes("PicoOut")); // Use actual name or address
+
+    if (picoOut) {
+      await picoOut.connect();
+      await picoOut.write(data);
+      console.log("Data sent to second Pico");
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -41,7 +96,7 @@ export default function DeviceScreen() {
     <ScreenWrapper>
       <View style={styles.container}>
         <Header></Header>
-        <TouchableOpacity onPress={() => router.back()} style={styles.back}>
+        <TouchableOpacity onPress={() => router.goBack()} style={styles.back}>
           <Ionicons name="arrow-back" size={24} color={Colors.primary} />
         </TouchableOpacity>
 
@@ -61,9 +116,12 @@ export default function DeviceScreen() {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push("/profile")}
+          onPress={async () => {
+            await requestBluetoothPermissions();
+            await connectToPico();
+          }}
         >
-          <Text style={styles.buttonText}>Coonnect Device</Text>
+          <Text style={styles.buttonText}>Connect Device</Text>
         </TouchableOpacity>
       </View>
     </ScreenWrapper>

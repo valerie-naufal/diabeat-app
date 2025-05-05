@@ -3,9 +3,10 @@ import { useState } from "react";
 import InputField from "../components/InputField";
 import ActionButton from "../components/ActionButton";
 import { Colors } from "../constants/Colors";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../types";
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../firebase/config";
@@ -24,7 +25,11 @@ export default function RegisterScreen() {
   const [bloodType, setBloodType] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-  const router = useRouter();
+  type NavigationProp = NativeStackNavigationProp<
+      RootStackParamList,
+      "Register"
+    >;
+    const router = useNavigation<NavigationProp>();
 
   const handleRegister = async () => {
     if (!email.includes("@") || !email.includes(".")) {
@@ -57,7 +62,7 @@ export default function RegisterScreen() {
         weight,
       });
 
-      router.replace("/dashboard");
+      router.replace("Dashboard");
     } catch (err: any) {
       alert("Registration failed: " + err.message);
     }
@@ -119,7 +124,7 @@ export default function RegisterScreen() {
 
       <ActionButton title="Register" onPress={handleRegister} />
 
-      <TouchableOpacity onPress={() => router.push("/login")}>
+      <TouchableOpacity onPress={() => router.push("Login")}>
         <Text style={styles.loginText}>
           Already have an account? <Text style={styles.link}>Login</Text>
         </Text>

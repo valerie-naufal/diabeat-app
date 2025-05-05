@@ -4,27 +4,34 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Image,
   Alert,
-  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import { Colors } from "../constants/Colors";
 import { auth } from "../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
-import * as ImagePicker from "expo-image-picker";
+import {
+  launchCamera,
+  launchImageLibrary,
+  CameraOptions,
+  ImageLibraryOptions,
+  Asset,
+} from "react-native-image-picker";
+import api from "../components/api";
 import axios from "axios";
 
 export default function ModalSearchScreen() {
-  const router = useRouter();
+  const router = useNavigation();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [nutritionalInfo, setNutritionalInfo] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -44,8 +51,28 @@ export default function ModalSearchScreen() {
     fetchProfile();
   }, []);
 
-  const apiUserToken = "3ae08f9b9a648f458da07a7be4dfd24f640e3930"; // Replace with your real token
-  const headers = { Authorization: `Bearer ${apiUserToken}` };
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    try {
+      const response = await axios.get(
+        `https://world.openfoodfacts.org/cgi/search.pl`,
+        {
+          params: {
+            search_terms: searchQuery,
+            search_simple: 1,
+            action: "process",
+            json: 1,
+          },
+        }
+      );
+
+      setSearchResults(response.data.products || []);
+    } catch (error) {
+      console.error("Search error:", error);
+      Alert.alert("Search failed", "Could not fetch food data.");
+    }
+  };
 
   const onSelectImage = async () => {
     Alert.alert("Select Image", "Choose an option", [
@@ -56,41 +83,33 @@ export default function ModalSearchScreen() {
   };
 
   const pickFromCamera = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert("Permission required", "Camera permission is needed.");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
+    const options: CameraOptions = {
+      mediaType: "photo",
+      cameraType: "back",
       quality: 1,
-    });
+    };
 
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setImageUri(uri);
-      uploadImage(uri);
-    }
+    launchCamera(options, (response) => {
+      handleImageResponse(response.assets);
+    });
   };
 
   const pickFromGallery = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert("Permission required", "Gallery permission is needed.");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
+    const options: ImageLibraryOptions = {
+      mediaType: "photo",
       quality: 1,
-    });
+    };
 
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
+    launchImageLibrary(options, (response) => {
+      handleImageResponse(response.assets);
+    });
+  };
+
+  const handleImageResponse = (assets?: Asset[]) => {
+    if (!assets || assets.length === 0) return;
+
+    const uri = assets[0].uri;
+    if (uri) {
       setImageUri(uri);
       uploadImage(uri);
     }
@@ -98,51 +117,45 @@ export default function ModalSearchScreen() {
 
   const uploadImage = async (uri: string) => {
     setLoading(true);
-
-    const formData = new FormData();
-    formData.append("image", {
-      uri,
-      name: "photo.jpg",
-      type: "image/jpeg",
-    } as any);
-
     try {
-      const uploadResponse = await axios.post(
-        "https://api.logmeal.com/v2/image/segmentation/complete",
+      const formData = new FormData();
+      formData.append("image", {
+        uri,
+        name: "photo.jpg",
+        type: "image/jpeg",
+      } as any);
+
+      const uploadRes = await api.post(
+        "image/segmentation/complete",
         formData,
         {
           headers: {
-            Authorization: `Bearer ${apiUserToken}`,
             "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      const imageId = uploadResponse.data.imageId;
-      console.log("Image uploaded successfully:", uploadResponse.data);
+      const imageId = uploadRes.data.imageId;
 
-      const nutritionalResponse = await axios.post(
-        "https://api.logmeal.com/v2/recipe/nutritionalInfo",
-        { imageId },
-        { headers }
-      );
+      const nutritionRes = await api.post("recipe/nutritionalInfo", {
+        imageId,
+      });
 
-      console.log("Nutritional Information:", nutritionalResponse.data);
-      setNutritionalInfo(nutritionalResponse.data);
-    } catch (error) {
-      console.error("Error:", error);
-      Alert.alert("Upload failed", "Something went wrong. Please try again.");
+      setNutritionalInfo(nutritionRes.data);
+      console.log("Nutrition Info:", nutritionRes.data);
+    } catch (err) {
+      console.error("Upload error:", err);
+      Alert.alert("Upload failed", "Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <View style={styles.container}>
       {/* Header */}
       <Header></Header>
-      <TouchableOpacity onPress={() => router.back()} style={styles.back}>
+      <TouchableOpacity onPress={() => router.goBack()} style={styles.back}>
         <Ionicons name="arrow-back" size={24} color={Colors.primary} />
       </TouchableOpacity>
 
@@ -153,6 +166,10 @@ export default function ModalSearchScreen() {
           placeholder="Search"
           placeholderTextColor={Colors.primary}
           style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
         />
       </View>
 
@@ -167,6 +184,24 @@ export default function ModalSearchScreen() {
           <Text style={styles.actionLabel}>Scan</Text>
         </TouchableOpacity>
       </View>
+
+      {searchResults.length > 0 && (
+        <View style={{ marginTop: 20 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10 }}>
+            Search Results:
+          </Text>
+          {searchResults.slice(0, 10).map((item, idx) => (
+            <View key={idx} style={{ marginBottom: 12 }}>
+              <Text style={{ fontWeight: "600" }}>
+                {item.product_name || "Unnamed food"}
+              </Text>
+              <Text style={{ fontSize: 12, color: "#555" }}>
+                Brand: {item.brands || "N/A"}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -220,5 +255,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.primary,
   },
-  back: { marginTop: 14, marginBottom: 14,alignSelf: "flex-start" },
+  back: { marginTop: 14, marginBottom: 14, alignSelf: "flex-start" },
 });
